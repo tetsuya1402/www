@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Деталі товару</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <style>
+        body {
+            max-width: 800px;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .product-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .product-image {
+            flex: 1 1 300px;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .product-info {
+            flex: 1 1 400px;
+        }
+
+        .sizes {
+            margin-top: 10px;
+        }
+
+        .sizes label {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .back-link {
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="back-link">← Назад до каталогу</a>
+    <div class="product-container">
+        <div class="product-image">
+            <img id="product-image" src="" alt="Фото товару" />
+        </div>
+        <div class="product-info">
+            <h2 id="product-name">Завантаження...</h2>
+            <p><strong>Ціна:</strong> <span id="product-price"></span> грн</p>
+            <p id="product-description"></p>
+
+            <div class="sizes">
+                <strong>Розмір:</strong><br />
+                <label><input type="radio" name="size" value="S" checked> S</label>
+                <label><input type="radio" name="size" value="M"> M</label>
+                <label><input type="radio" name="size" value="L"> L</label>
+                <label><input type="radio" name="size" value="XL"> XL</label>
+            </div>
+
+            <button id="add-to-cart-btn" style="margin-top: 20px;">Додати до кошика</button>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        const defaultProducts = [
+            { id: 1, name: "Футболка біла", price: 500, category: "Футболки", image: "images/product1.jpg", description: "Легка футболка" },
+            { id: 2, name: "Костюм", price: 700, category: "Костюми", image: "images/product2.jpg", description: "Елегантний костюм" },
+            { id: 3, name: "Куртка", price: 5100, category: "Куртки", image: "images/product3.jpg", description: "Тепла зимова куртка" },
+            { id: 4, name: "Кроссовки", price: 4100, category: "Кроссовки", image: "images/product4.jpg", description: "Спортивні кросівки" }
+        ];
+        const adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+        const products = [...defaultProducts, ...adminProducts];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+        const product = products.find(p => p.id === productId);
+
+        if (!product) {
+            document.body.innerHTML = '<p>Товар не знайдено. <a href="index.html">Повернутись назад</a></p>';
+        } else {
+            document.getElementById('product-name').textContent = product.name;
+            document.getElementById('product-price').textContent = product.price;
+            document.getElementById('product-image').src = product.image;
+            document.getElementById('product-description').textContent = product.description || 'Опис відсутній.';
+            document.getElementById('add-to-cart-btn').onclick = () => {
+                const size = document.querySelector('input[name="size"]:checked').value;
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                cart.push({ id: product.id, size });
+                localStorage.setItem('cart', JSON.stringify(cart));
+                alert(`Товар "${product.name}" (розмір ${size}) додано до кошика!`);
+            };
+        }
+    </script>
+</body>
+
+</html>

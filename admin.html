@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Адмін-панель</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <h1><a href="index.html">👕 Магазин</a></h1>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    </header>
+
+    <main class="container">
+        <h2>Адмін-панель</h2>
+        <form id="add-product-form">
+            <input type="text" id="name" placeholder="Назва товару" required />
+            <input type="number" id="price" placeholder="Ціна" required />
+            <input type="text" id="image" placeholder="Посилання на зображення" required />
+            <input type="text" id="category" placeholder="Категорія (наприклад: Футболки)" required />
+            <textarea id="description" placeholder="Опис товару"></textarea>
+            <button type="submit">Додати товар</button>
+        </form>
+
+        <h3>Додані товари</h3>
+        <div id="admin-product-list" class="grid"></div>
+    </main>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+        }
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        let allProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+        const form = document.getElementById("add-product-form");
+        const list = document.getElementById("admin-product-list");
+
+        function renderProducts() {
+            list.innerHTML = "";
+            allProducts.forEach((product, index) => {
+                list.innerHTML += `
+          <div class="card">
+            <img src="${product.image}" alt="${product.name}" />
+            <div class="card-body">
+              <h3>${product.name}</h3>
+              <p>${product.price} грн</p>
+              <p><small>${product.category}</small></p>
+              <button onclick="deleteProduct(${index})">🗑️ Видалити</button>
+            </div>
+          </div>
+        `;
+            });
+        }
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const product = {
+                id: Date.now(),
+                name: document.getElementById("name").value,
+                price: parseFloat(document.getElementById("price").value),
+                image: document.getElementById("image").value,
+                category: document.getElementById("category").value,
+                description: document.getElementById("description").value
+            };
+            allProducts.push(product);
+            localStorage.setItem("adminProducts", JSON.stringify(allProducts));
+            form.reset();
+            renderProducts();
+        });
+
+        function deleteProduct(index) {
+            allProducts.splice(index, 1);
+            localStorage.setItem("adminProducts", JSON.stringify(allProducts));
+            renderProducts();
+        }
+
+        renderProducts();
+    </script>
+</body>
+
+</html>

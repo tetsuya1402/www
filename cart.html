@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кошик</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+
+<body>
+  <header class="main-header">
+    <div class="logo">
+      <h1><a href="index.html">👕 Магазин</a></h1>
+    </div>
+    <button onclick="toggleTheme()">🌓</button>
+  </header>
+
+  <main class="container">
+    <h2>Ваш кошик</h2>
+    <div id="cart-items" class="grid"></div>
+    <p id="empty-cart" style="display:none;">🛒 Кошик порожній</p>
+  </main>
+
+  <script>
+    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    const defaultProducts = [
+      { id: 1, name: "Футболка біла", price: 500, image: "images/product1.jpg" },
+      { id: 2, name: "Костюм", price: 700, image: "images/product2.jpg" },
+      { id: 3, name: "Куртка", price: 5100, image: "images/product3.jpg" },
+      { id: 4, name: "Кроссовки", price: 4100, image: "images/product4.jpg" }
+    ];
+    const adminProducts = JSON.parse(localStorage.getItem("adminProducts")) || [];
+    const products = [...defaultProducts, ...adminProducts];
+
+    const cartItemsContainer = document.getElementById('cart-items');
+    const emptyCartText = document.getElementById('empty-cart');
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function displayCart() {
+      cartItemsContainer.innerHTML = '';
+      if (cart.length === 0) {
+        emptyCartText.style.display = 'block';
+        return;
+      }
+      emptyCartText.style.display = 'none';
+
+      cart.forEach((item, index) => {
+        const product = products.find(p => p.id === item.id);
+        if (product) {
+          cartItemsContainer.innerHTML += `
+            <div class="card">
+              <img src="${product.image}" alt="${product.name}" />
+              <div class="card-body">
+                <h3>${product.name}</h3>
+                <p>Ціна: ${product.price} грн</p>
+                <p>Розмір: ${item.size || 'M'}</p>
+                <button onclick="removeFromCart(${index})">🗑️ Видалити</button>
+<a href="checkout.html">
+  <button style="margin-top: 20px;">Оформити замовлення</button>
+</a>
+
+              </div>
+            </div>
+          `;
+        }
+      });
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      displayCart();
+    }
+
+    displayCart();
+
+  </script>
+</body>
+
+</html
